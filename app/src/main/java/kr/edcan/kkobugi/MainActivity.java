@@ -10,10 +10,10 @@ import android.os.Bundle;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
+    // 안씀
     int gyroX;
     int gyroY;
     int gyroZ;
-
     int accX;
     int accY;
     int accZ;
