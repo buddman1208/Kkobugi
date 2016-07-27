@@ -1,4 +1,4 @@
-package kr.edcan.kkobugi;
+package kr.songjun51.kkobugi.models;
 
 /**
  * Created by Chad on 7/25/16.

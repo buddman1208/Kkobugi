@@ -1,4 +1,4 @@
-package kr.edcan.kkobugi;
+package kr.songjun51.kkobugi.models;
 
 import com.google.gson.annotations.SerializedName;
 

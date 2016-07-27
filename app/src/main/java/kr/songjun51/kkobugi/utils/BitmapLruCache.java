@@ -1,4 +1,4 @@
-package kr.edcan.kkobugi;
+package kr.songjun51.kkobugi.utils;
 
 import android.graphics.Bitmap;
 import android.support.v4.util.LruCache;

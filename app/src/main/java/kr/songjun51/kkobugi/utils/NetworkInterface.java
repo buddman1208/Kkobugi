@@ -1,7 +1,11 @@
-package kr.edcan.kkobugi;
+package kr.songjun51.kkobugi.utils;
 
 import java.util.List;
 
+import kr.songjun51.kkobugi.models.FacebookUser;
+import kr.songjun51.kkobugi.models.StatusData;
+import kr.songjun51.kkobugi.models.TodayData;
+import kr.songjun51.kkobugi.models.User;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.GET;

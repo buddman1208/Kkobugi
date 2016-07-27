@@ -1,4 +1,4 @@
-package kr.edcan.kkobugi;
+package kr.songjun51.kkobugi;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

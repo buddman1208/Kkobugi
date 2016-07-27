@@ -1,4 +1,4 @@
-package kr.edcan.kkobugi;
+package kr.songjun51.kkobugi.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,6 +8,9 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+
+import kr.songjun51.kkobugi.models.ListData;
+import kr.songjun51.kkobugi.R;
 
 /**
  * Created by Chad on 7/25/16.

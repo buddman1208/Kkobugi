@@ -1,4 +1,4 @@
-package kr.edcan.kkobugi;
+package kr.songjun51.kkobugi.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;

@@ -1,6 +1,5 @@
-package kr.edcan.kkobugi;
+package kr.songjun51.kkobugi.activity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,14 +16,16 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
+
+import kr.songjun51.kkobugi.R;
+import kr.songjun51.kkobugi.adapter.CommonListViewAdapter;
+import kr.songjun51.kkobugi.adapter.DashboardAdapter;
+import kr.songjun51.kkobugi.models.ListData;
 
 public class MainViewActivity extends AppCompatActivity {
 

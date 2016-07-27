@@ -1,9 +1,12 @@
-package kr.edcan.kkobugi;
+package kr.songjun51.kkobugi.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v4.util.Pair;
 import android.util.Log;
+
+import kr.songjun51.kkobugi.models.FacebookUser;
+import kr.songjun51.kkobugi.models.User;
 
 
 /**
@@ -53,20 +56,17 @@ public class DataManager {
         editor.putBoolean(IS_SILHOUETTE, user.content.picture.data.is_silhouette);
         editor.apply();
     }
-//
-    //이 함수는 알아서 활용시켜서 쓰셈
-//    public Pair<Boolean, User> getActiveUser() {
-//        if (preferences.getBoolean(HAS_ACTIVE_USER, false)) {
-//            int userType = preferences.getInt(LOGIN_TYPE, -1);
-//            String id = preferences.getString(USER_ID, "");
-//            String name = preferences.getString(USER_NAME, "");
-//            boolean isSilhouette = preferences.getBoolean(IS_SILHOUETTE, true);
-//            String url = preferences.getString(USER_PROFILE_URL, "");
-//            Log.e("asdf", "name : " + name + "url : " + url);
-//            User user = new User(userType, name, id, isSilhouette, url);
-//            return Pair.create(true, user);
-//        } else return Pair.create(false, null);
-//    }
+    public Pair<Boolean, User> getActiveUser() {
+        if (preferences.getBoolean(HAS_ACTIVE_USER, false)) {
+            int userType = preferences.getInt(LOGIN_TYPE, -1);
+            String id = preferences.getString(USER_ID, "");
+            String name = preferences.getString(USER_NAME, "");
+            boolean isSilhouette = preferences.getBoolean(IS_SILHOUETTE, true);
+            String url = preferences.getString(USER_PROFILE_URL, "");
+            User user = new User(userType, name, id, isSilhouette, url);
+            return Pair.create(true, user);
+        } else return Pair.create(false, null);
+    }
 
     public String getFacebookUserCredential() {
         if (preferences.getBoolean(HAS_ACTIVE_USER, false) && preferences.getInt(LOGIN_TYPE, -1) == 0) {

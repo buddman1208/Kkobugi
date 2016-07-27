@@ -1,4 +1,4 @@
-package kr.edcan.kkobugi;
+package kr.songjun51.kkobugi.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -18,6 +18,8 @@ import android.util.AttributeSet;
 import android.widget.ImageView;
 
 import com.android.volley.toolbox.NetworkImageView;
+
+import kr.songjun51.kkobugi.R;
 
 
 /**

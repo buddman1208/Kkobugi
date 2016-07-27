@@ -1,4 +1,4 @@
-package kr.edcan.kkobugi;
+package kr.songjun51.kkobugi.activity;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -7,6 +7,8 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import kr.songjun51.kkobugi.R;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
