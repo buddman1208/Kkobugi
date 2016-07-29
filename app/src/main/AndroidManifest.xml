@@ -14,8 +14,9 @@
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
+
         <activity android:name=".activity.MainActivity" />
-        <activity android:name=".activity.MainViewActivity"/>
+        <activity android:name=".activity.MainViewActivity" />
         <activity
             android:name=".activity.AuthActivity"
             android:theme="@style/AppTheme">
@@ -24,6 +25,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".utils.KkobugiService"
+            android:enabled="true" />
+        <receiver
+            android:name=".utils.TimeReceiver"
+            android:enabled="true"
+            android:exported="false"
+            android:label="TimeReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.TIME_TICK"/>
+                <action android:name="android.intent.action.TIME_SET"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

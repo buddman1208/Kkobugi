@@ -21,9 +21,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
@@ -32,8 +34,10 @@ import kr.songjun51.kkobugi.R;
 import kr.songjun51.kkobugi.adapter.CommonListViewAdapter;
 import kr.songjun51.kkobugi.adapter.DashboardAdapter;
 import kr.songjun51.kkobugi.models.ListData;
+import kr.songjun51.kkobugi.models.TodayData;
 import kr.songjun51.kkobugi.models.User;
 import kr.songjun51.kkobugi.utils.DataManager;
+import kr.songjun51.kkobugi.utils.KkobugiService;
 import kr.songjun51.kkobugi.utils.NetworkHelper;
 import kr.songjun51.kkobugi.utils.NetworkInterface;
 import retrofit2.Call;
@@ -53,7 +57,7 @@ public class MainViewActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_view);
-
+        startService(new Intent(getApplicationContext(), KkobugiService.class));
         setAppbarLayout();
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -63,27 +67,6 @@ public class MainViewActivity extends AppCompatActivity {
         service = NetworkHelper.getNetworkInstance();
         manager = new DataManager();
         manager.initializeManager(this);
-        Call<List<User>> getFriendList = service.getFriendsFriend(manager.getActiveUser().second.getId());
-        getFriendList.enqueue(new Callback<List<User>>() {
-            @Override
-            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
-                Log.e("asdf", response.code() + "");
-                switch (response.code()) {
-                    case 200:
-                        Log.e("asdf", response.body().size() + "");
-                        for (User user : response.body()) {
-                            Log.e("asdf", user.getName());
-                        }
-                        break;
-
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<User>> call, Throwable t) {
-                Log.e("asdf", t.getMessage());
-            }
-        });
     }
 
     private void setAppbarLayout() {
@@ -92,11 +75,6 @@ public class MainViewActivity extends AppCompatActivity {
         toolbar.setTitleTextColor(getResources().getColor(R.color.colorPrimaryDark));
         getSupportActionBar().setTitle("kkobugi");
         getSupportActionBar().setElevation(0);
-//        getSupportActionBar().setDisplayShowCustomEnabled(true);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        Drawable drawable = getResources().getDrawable(R.drawable.abc_ic_ab_back_material);
-//        drawable.setColorFilter(getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.SRC_ATOP);
-//        getSupportActionBar().setHome`AsUpIndicator(drawable);
     }
 
     public static class RankingShowFragment extends Fragment {
@@ -137,25 +115,42 @@ public class MainViewActivity extends AppCompatActivity {
             return rootView;
         }
 
-        String backgroundColor[] = new String[]{"#DC383D", "#000000"};
+        String backgroundColor[] = new String[]{"#40A295", "#DC383D"};
 
         public void setView(View rootView, int page) {
             switch (page) {
                 case 0:
-                    int data = 0;
+                    int data = dataManager.getKkobugiPercentage();
                     RelativeLayout background = (RelativeLayout) rootView.findViewById(R.id.main_dashboard_background);
+                    TextView percentage = (TextView) rootView.findViewById(R.id.main_dashboard_percent);
+                    percentage.setText(data + "%");
                     background.setBackground(new ColorDrawable(Color.parseColor(backgroundColor[(data < 50) ? 0 : 1])));
-                    RecyclerView dashGraph = (RecyclerView) rootView.findViewById(R.id.main_dashboard_recyclerview);
+                    final RecyclerView dashGraph = (RecyclerView) rootView.findViewById(R.id.main_dashboard_recyclerview);
                     dashGraph.setHasFixedSize(false);
                     LinearLayoutManager manager = new LinearLayoutManager(getActivity().getApplicationContext());
                     manager.setOrientation(LinearLayoutManager.HORIZONTAL);
                     dashGraph.setLayoutManager(manager);
                     final ArrayList<Pair<Integer, Integer>> arr = new ArrayList<>();
-                    for (int i = 0; i <= 31; i++) {
-                        arr.add(Pair.create(i, new Random().nextInt(100)));
-                    }
-                    DashboardAdapter adapter = new DashboardAdapter(getActivity().getApplicationContext(), arr);
-                    dashGraph.setAdapter(adapter);
+                    Call<List<TodayData>> getDataArray = service.getDataArray(dataManager.getActiveUser().second.getId());
+                    getDataArray.enqueue(new Callback<List<TodayData>>() {
+                        @Override
+                        public void onResponse(Call<List<TodayData>> call, Response<List<TodayData>> response) {
+                            Log.e("asdf", response.code() + "");
+                            switch (response.code()) {
+                                case 200:
+                                    for (TodayData d : response.body()) {
+                                        arr.add(Pair.create(Integer.parseInt(d.getDate()), Integer.parseInt(d.getPercent())));
+                                    }
+                                    DashboardAdapter adapter = new DashboardAdapter(getActivity().getApplicationContext(), arr);
+                                    dashGraph.setAdapter(adapter);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<TodayData>> call, Throwable t) {
+                            Log.e("asdf", t.getMessage());
+                        }
+                    });
 
                     RelativeLayout video = (RelativeLayout) rootView.findViewById(R.id.main_dashboard_video);
                     video.setOnClickListener(new View.OnClickListener() {
@@ -178,13 +173,15 @@ public class MainViewActivity extends AppCompatActivity {
                             switch (response.code()) {
                                 case 200:
                                     for (User u : response.body()) {
-                                        rankingArr.add(new ListData(u.getName(), u.getUserType()+""));
+                                        rankingArr.add(new ListData(u.getName(), u.getUserType() + ""));
+                                        Log.e("asdf", u.getName());
                                     }
                                     break;
                                 case 401:
                                     break;
                             }
                         }
+
                         @Override
                         public void onFailure(Call<List<User>> call, Throwable t) {
                             Toast.makeText(rankingView.getContext(), "서버와의 연동에 문제가 발생했습니다. 잠시 후 다시 시도해주세요", Toast.LENGTH_SHORT).show();
@@ -202,9 +199,12 @@ public class MainViewActivity extends AppCompatActivity {
                     getFriendList.enqueue(new Callback<List<User>>() {
                         @Override
                         public void onResponse(Call<List<User>> call, Response<List<User>> response) {
-                            switch (response.code()){
+                            switch (response.code()) {
                                 case 200:
-//                                    friendArr.add(new ListData());
+                                    for (int i = 0; i < response.body().size(); i++) {
+                                        User u = response.body().get(i);
+                                        friendArr.add(new ListData(u.getName(), u.getProfileurl(), i));
+                                    }
                                     break;
                                 case 401:
                                     break;
