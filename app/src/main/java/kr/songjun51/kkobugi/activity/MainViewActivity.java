@@ -1,6 +1,8 @@
 package kr.songjun51.kkobugi.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -13,25 +15,39 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.logging.Logger;
 
 import kr.songjun51.kkobugi.R;
 import kr.songjun51.kkobugi.adapter.CommonListViewAdapter;
 import kr.songjun51.kkobugi.adapter.DashboardAdapter;
 import kr.songjun51.kkobugi.models.ListData;
+import kr.songjun51.kkobugi.models.User;
+import kr.songjun51.kkobugi.utils.DataManager;
+import kr.songjun51.kkobugi.utils.NetworkHelper;
+import kr.songjun51.kkobugi.utils.NetworkInterface;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainViewActivity extends AppCompatActivity {
 
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
+    DataManager manager;
+    NetworkInterface service;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +60,30 @@ public class MainViewActivity extends AppCompatActivity {
         mViewPager.setAdapter(mSectionsPagerAdapter);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+        service = NetworkHelper.getNetworkInstance();
+        manager = new DataManager();
+        manager.initializeManager(this);
+        Call<List<User>> getFriendList = service.getFriendsFriend(manager.getActiveUser().second.getId());
+        getFriendList.enqueue(new Callback<List<User>>() {
+            @Override
+            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                Log.e("asdf", response.code() + "");
+                switch (response.code()) {
+                    case 200:
+                        Log.e("asdf", response.body().size() + "");
+                        for (User user : response.body()) {
+                            Log.e("asdf", user.getName());
+                        }
+                        break;
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<User>> call, Throwable t) {
+                Log.e("asdf", t.getMessage())
+            }
+        });
     }
 
     private void setAppbarLayout() {
@@ -61,6 +101,8 @@ public class MainViewActivity extends AppCompatActivity {
 
     public static class RankingShowFragment extends Fragment {
         private static final String ARG_SECTION_NUMBER = "pageNumber";
+        private static NetworkInterface service;
+        private static DataManager dataManager;
 
         public RankingShowFragment() {
         }
@@ -70,12 +112,15 @@ public class MainViewActivity extends AppCompatActivity {
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
+            service = NetworkHelper.getNetworkInstance();
             return fragment;
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView = null;
+            dataManager = new DataManager();
+            dataManager.initializeManager(container.getContext());
             int page = getArguments().getInt(ARG_SECTION_NUMBER);
             switch (page) {
                 case 0:
@@ -92,15 +137,20 @@ public class MainViewActivity extends AppCompatActivity {
             return rootView;
         }
 
+        String backgroundColor[] = new String[]{"DC383D", ""};
+
         public void setView(View rootView, int page) {
             switch (page) {
                 case 0:
+                    int data = 0;
+                    RelativeLayout background = (RelativeLayout) rootView.findViewById(R.id.main_dashboard_background);
+                    background.setBackground(new ColorDrawable(Color.parseColor(backgroundColor[(data < 50) ? 0 : 1])));
                     RecyclerView dashGraph = (RecyclerView) rootView.findViewById(R.id.main_dashboard_recyclerview);
                     dashGraph.setHasFixedSize(false);
                     LinearLayoutManager manager = new LinearLayoutManager(getActivity().getApplicationContext());
                     manager.setOrientation(LinearLayoutManager.HORIZONTAL);
                     dashGraph.setLayoutManager(manager);
-                    ArrayList<Pair<Integer, Integer>> arr = new ArrayList<>();
+                    final ArrayList<Pair<Integer, Integer>> arr = new ArrayList<>();
                     for (int i = 0; i <= 31; i++) {
                         arr.add(Pair.create(i, new Random().nextInt(100)));
                     }
@@ -118,28 +168,53 @@ public class MainViewActivity extends AppCompatActivity {
                     });
                     break;
                 case 1:
-                    ListView rankingView = (ListView) rootView.findViewById(R.id.main_ranking_listview);
-                    ArrayList<ListData> rankingArr = new ArrayList<>();
-                    rankingArr.add(new ListData("구창림", "72%"));
-                    rankingArr.add(new ListData("구창림", "72%"));
-                    rankingArr.add(new ListData("구창림", "72%"));
-                    rankingArr.add(new ListData("구창림", "72%"));
-                    rankingArr.add(new ListData("구창림", "72%"));
-                    rankingArr.add(new ListData("구창림", "72%"));
-                    rankingArr.add(new ListData("구창림", "72%"));
-                    rankingArr.add(new ListData("구창림", "72%"));
-                    rankingArr.add(new ListData("구창림", "72%"));
-                    rankingArr.add(new ListData("구창림", "72%"));
+                    final ListView rankingView = (ListView) rootView.findViewById(R.id.main_ranking_listview);
+                    final ArrayList<ListData> rankingArr = new ArrayList<>();
+                    Call<List<User>> getRankingInfo = service.getFriendRank(dataManager.getActiveUser().second.getId());
+                    getRankingInfo.enqueue(new Callback<List<User>>() {
+                        @Override
+                        public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                            switch (response.code()) {
+                                case 200:
+                                    for (User u : response.body()) {
+                                        rankingArr.add(new ListData(u.getName(), u.getUserType()+""));
+                                    }
+                                    break;
+                                case 401:
+                                    break;
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call<List<User>> call, Throwable t) {
+                            Toast.makeText(rankingView.getContext(), "서버와의 연동에 문제가 발생했습니다. 잠시 후 다시 시도해주세요", Toast.LENGTH_SHORT).show();
+                            Log.e("asdf", t.getMessage());
+                        }
+                    });
                     CommonListViewAdapter adapter1 = new CommonListViewAdapter(0, getContext(), rankingArr);
                     rankingView.setAdapter(adapter1);
                     break;
                 case 2:
-                    ListView friendView = (ListView) rootView.findViewById(R.id.main_friend_listview);
-                    ArrayList<ListData> friendArr = new ArrayList<>();
-                    friendArr.add(new ListData("구창림", "72%", 1));
-                    friendArr.add(new ListData("구창림", "72%", 1));
-                    friendArr.add(new ListData("구창림", "72%", 1));
-                    friendArr.add(new ListData("구창림", "72%", 1));
+                    final ListView friendView = (ListView) rootView.findViewById(R.id.main_friend_listview);
+                    final ArrayList<ListData> friendArr = new ArrayList<>();
+                    Call<List<User>> getFriendList = service.getFriendsFriend(dataManager.getActiveUser().second.getId());
+                    getFriendList.enqueue(new Callback<List<User>>() {
+                        @Override
+                        public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                            switch (response.code()){
+                                case 200:
+                                    friendArr.add(new ListData());
+                                    break;
+                                case 401:
+                                    break;
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<User>> call, Throwable t) {
+                            Log.e("asdf", t.getMessage());
+                            Toast.makeText(friendView.getContext(), "서버와의 연동에 문제가 발생했습니다. 잠시후 다시 시도해주세요", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                     CommonListViewAdapter adapter2 = new CommonListViewAdapter(1, getContext(), friendArr);
                     friendView.setAdapter(adapter2);
                     break;

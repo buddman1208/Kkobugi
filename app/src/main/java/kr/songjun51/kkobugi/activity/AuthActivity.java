@@ -45,6 +45,7 @@ public class AuthActivity extends AppCompatActivity {
             public void onSuccess(LoginResult loginResult) {
                 new LoadFacebookInfo().execute(loginResult.getAccessToken().getToken());
                 dataManager.saveUserCredential(loginResult.getAccessToken().getToken());
+                Log.e("asdf", dataManager.getActiveUser().second.getId()+"");
             }
 
             @Override

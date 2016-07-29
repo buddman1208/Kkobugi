@@ -12,6 +12,9 @@ import kr.songjun51.kkobugi.R;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
+    /*
+    *  Disabled Activity
+    * */
     // 안씀
     int gyroX;
     int gyroY;
