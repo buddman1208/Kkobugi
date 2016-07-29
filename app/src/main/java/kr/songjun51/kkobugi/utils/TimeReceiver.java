@@ -29,7 +29,7 @@ public class TimeReceiver extends BroadcastReceiver {
                     public void onResponse(Call<TodayData> call, Response<TodayData> response) {
                         switch (response.code()) {
                             case 200:
-
+                                Log.e("asdf", "Success");
                                 break;
                             case 401:
                                 break;
