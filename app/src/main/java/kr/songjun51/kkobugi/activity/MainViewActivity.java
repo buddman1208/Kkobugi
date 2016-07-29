@@ -81,7 +81,7 @@ public class MainViewActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<List<User>> call, Throwable t) {
-                Log.e("asdf", t.getMessage())
+                Log.e("asdf", t.getMessage());
             }
         });
     }
@@ -96,7 +96,7 @@ public class MainViewActivity extends AppCompatActivity {
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 //        Drawable drawable = getResources().getDrawable(R.drawable.abc_ic_ab_back_material);
 //        drawable.setColorFilter(getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.SRC_ATOP);
-//        getSupportActionBar().setHomeAsUpIndicator(drawable);
+//        getSupportActionBar().setHome`AsUpIndicator(drawable);
     }
 
     public static class RankingShowFragment extends Fragment {
@@ -137,7 +137,7 @@ public class MainViewActivity extends AppCompatActivity {
             return rootView;
         }
 
-        String backgroundColor[] = new String[]{"DC383D", ""};
+        String backgroundColor[] = new String[]{"#DC383D", "#000000"};
 
         public void setView(View rootView, int page) {
             switch (page) {
@@ -171,6 +171,7 @@ public class MainViewActivity extends AppCompatActivity {
                     final ListView rankingView = (ListView) rootView.findViewById(R.id.main_ranking_listview);
                     final ArrayList<ListData> rankingArr = new ArrayList<>();
                     Call<List<User>> getRankingInfo = service.getFriendRank(dataManager.getActiveUser().second.getId());
+                    Log.e("asdf", dataManager.getActiveUser().second.getId());
                     getRankingInfo.enqueue(new Callback<List<User>>() {
                         @Override
                         public void onResponse(Call<List<User>> call, Response<List<User>> response) {
@@ -196,13 +197,14 @@ public class MainViewActivity extends AppCompatActivity {
                 case 2:
                     final ListView friendView = (ListView) rootView.findViewById(R.id.main_friend_listview);
                     final ArrayList<ListData> friendArr = new ArrayList<>();
+                    Log.e("asdf_id", dataManager.getActiveUser().second.getId());
                     Call<List<User>> getFriendList = service.getFriendsFriend(dataManager.getActiveUser().second.getId());
                     getFriendList.enqueue(new Callback<List<User>>() {
                         @Override
                         public void onResponse(Call<List<User>> call, Response<List<User>> response) {
                             switch (response.code()){
                                 case 200:
-                                    friendArr.add(new ListData());
+//                                    friendArr.add(new ListData());
                                     break;
                                 case 401:
                                     break;
