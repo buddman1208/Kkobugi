@@ -58,7 +58,9 @@ public class AuthActivity extends AppCompatActivity {
     }
 
     private void setFacebook() {
-        LoginButton button = (LoginButton) findViewById(R.id.facebook_login);
+        LoginButton fbLogin = (LoginButton) findViewById(R.id.facebook_login);
+        String permissions[] = new String[]{"email", "user_about_me", "user_friends"};
+        fbLogin.setReadPermissions(permissions);
         LoginManager.getInstance().registerCallback(manager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {

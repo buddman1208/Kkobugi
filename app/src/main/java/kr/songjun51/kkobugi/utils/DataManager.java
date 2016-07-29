@@ -49,6 +49,10 @@ public class DataManager {
         editor.apply();
     }
 
+    public String getUserCredential() {
+        return preferences.getString(USER_TOKEN, "");
+    }
+
     public void saveFacebookUserInfo(FacebookUser user) {
         editor.putInt(LOGIN_TYPE, 0);
         editor.putBoolean(HAS_ACTIVE_USER, true);

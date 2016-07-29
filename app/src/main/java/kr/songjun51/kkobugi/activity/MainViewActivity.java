@@ -173,7 +173,7 @@ public class MainViewActivity extends AppCompatActivity {
                             switch (response.code()) {
                                 case 200:
                                     for (User u : response.body()) {
-                                        rankingArr.add(new ListData(u.getName(), u.getUserType() + ""));
+                                        rankingArr.add(new ListData(u.getName(), u.getProfileurl() + ""));
                                         Log.e("asdf", u.getName());
                                     }
                                     break;

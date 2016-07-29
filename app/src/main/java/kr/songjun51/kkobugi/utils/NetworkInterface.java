@@ -40,9 +40,8 @@ public interface NetworkInterface {
     @FormUrlEncoded
     Call<User> destroy(@Field("id") String id);
 
-    @POST("/friend/facebook/find")
-    @FormUrlEncoded
-    Call<List<User>> callFacebookFriend(@Field("name") String name);
+    @GET("/friend/facebook/find")
+    Call<List<User>> callFacebookFriend(@Query("access_token") String token);
 
     @POST("/friend/local/find")
     @FormUrlEncoded
